@@ -141,12 +141,17 @@ body {
   border-radius: 50%;
   padding: 6px;
   font-size: 20px;
-  display: flex;
+  display: none; /* Hidden by default */
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s ease;
   border: none;
   cursor: pointer;
+}
+
+/* Show send button only when input has text */
+.message-input:not(:placeholder-shown) ~ .chat-controls #send-message {
+  display: flex;
 }
 
 #send-message:hover {
