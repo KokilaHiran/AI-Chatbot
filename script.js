@@ -22,7 +22,7 @@ const createMessageElement = (content, classes) => {\
     div.innerHTML = content;
     return div;
 };
-
+  
 const generateBotResponse = async (incomingMessageDiv) => {
     const message = incomingMessageDiv.querySelector('.message-text').textContent;
 
@@ -37,5 +37,32 @@ const generateBotResponse = async (incomingMessageDiv) => {
             ]
         })
     };
+
+    try {
+        const response = await fetch(API_URL,requestOption);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error?.message || 'Error generating response');
+        }
+
+        if(data.candidates && data.candidates.length > 0){
+            const apiResponseText = data.candidates[0].content.parts[0].text
+                .replace(/\*\(.*?)\*\*/g,"$1")
+                .trim();
+
+            messageElement.innerHTML = apiResponseText;
+        }
+        else{
+            messageElement.innerHTML = "No response from API";
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        messageElement.innerHTML = "Error generating response";
+    } finally {
+        userData.file = {}
+        incomingMessageDiv.classList.remove("loading");
+        chatBody.scrollTo({top: chatBody.scrollHeight, behavior: 'smooth'});
+    }
 };
         
