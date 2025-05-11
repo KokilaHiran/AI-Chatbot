@@ -65,4 +65,45 @@ const generateBotResponse = async (incomingMessageDiv) => {
         chatBody.scrollTo({top: chatBody.scrollHeight, behavior: 'smooth'});
     }
 };
-        
+
+const handleOutgoingMessage = (e) => {
+    e.preventDefault();
+    userData.message = messageInput.value.trim();
+
+    if (!userData.message) return;
+    messageInput.value = '';
+    fileUploadWrapper.classList.remove('file-uploaded');
+
+    const messageElement = `<div class="message-text"></div>${userData.file.data ? `<img src="data:${userData.file.mime_type};base64,${userData.file.data}" class="attachment" />` : ''}`;
+
+    const OutgoingMessageDiv = createMessageElement(messageElement, "user-message", "thinking");
+    OutgoingMessageDiv.querySelector('.message-text').textContent = userData.message;
+    chatBody.appendChild(OutgoingMessageDiv);
+    chatBody.scrollTo({top: chatBody.scrollHeight, behavior: 'smooth'});
+
+    setTimeout(() => {
+        const messageContent = `
+                            <img src="support_agent_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" width="25" height="50" />
+
+                            <div class="message-text">
+                            <div class="thinking-indicator">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                            </div>`:
+
+                            const incomingMessageDiv = createMessageElement(messageContent, "bot-message");
+                            chatBody.appendChild(incomingMessageDiv);
+                            chatBody.scrollTo({top: chatBody.scrollHeight, behavior: 'smooth'});
+
+                            generateBotResponse(incomingMessageDiv);
+    }, 1000);
+};
+
+messageInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        handleOutgoingMessage(e);
+    }
+});
+
