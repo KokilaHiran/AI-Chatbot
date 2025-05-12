@@ -141,7 +141,7 @@ body {
   border-radius: 50%;
   padding: 6px;
   font-size: 20px;
-  display: none; /* Hidden by default */
+  display: none; 
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s ease;
@@ -149,7 +149,7 @@ body {
   cursor: pointer;
 }
 
-/* Show send button only when input has text */
+
 .message-input:not(:placeholder-shown) ~ .chat-controls #send-message {
   display: flex;
 }
@@ -248,7 +248,7 @@ body {
     }
 }
 
-/* Fix for file cancel button */
+
 #file-cancel {
   display: none;
 }
@@ -257,14 +257,14 @@ body {
   display: block;
 }
 
-/* Emoji mart styling */
+
 .emoji-mart {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   border-radius: 0.5rem;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* User message styling */
+
 .user-message {
   justify-content: flex-end;
   margin-left: auto;
@@ -275,7 +275,7 @@ body {
   color: white;
 }
 
-/* Fix for chat message attachments */
+
 .message img.attachment {
   max-width: 200px;
   max-height: 150px;
@@ -283,7 +283,7 @@ body {
   margin-top: 8px;
 }
 
-/* Updated emoji picker styling */
+
 .emoji-picker-container {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
   border-radius: 0.5rem;
@@ -313,7 +313,7 @@ body {
   border-radius: 4px;
 }
 
-/* Enhanced message styling with images */
+
 .message-container {
   display: flex;
   flex-direction: column;
@@ -329,13 +329,13 @@ body {
   align-items: flex-start;
 }
 
-/* Improve message text with images */
+
 .message .message-text {
   max-width: 100%;
   word-break: break-word;
 }
 
-/* Better image attachment styling */
+
 .message img.attachment {
   max-width: 250px;
   max-height: 200px;
@@ -354,7 +354,7 @@ body {
   align-self: flex-start;
 }
 
-/* Add image caption if needed */
+
 .image-caption {
   font-size: 0.8rem;
   color: #666;

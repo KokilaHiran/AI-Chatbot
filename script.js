@@ -98,7 +98,6 @@ const handleOutgoingMessage = (e) => {
     console.log("Sending message:", userData.message);
     messageInput.value = '';
     
-    // Create message with better structure for images
     let messageContent = '';
     
     if (userData.file.data) {
@@ -115,10 +114,8 @@ const handleOutgoingMessage = (e) => {
     chatBody.appendChild(outgoingMessageDiv);
     chatBody.scrollTo({top: chatBody.scrollHeight, behavior: 'smooth'});
     
-    // Reset file upload UI
     fileUploadWrapper.classList.remove('has-image');
 
-    // Show bot typing indicator and generate response
     setTimeout(() => {
         const messageContent = `
             <img src="support_agent_24dp_1F1F1F_FILL0_wght400_GRAD0_opsz24.svg" width="25" height="50" />
@@ -138,7 +135,6 @@ const handleOutgoingMessage = (e) => {
     }, 500);
 };
 
-// Event listeners
 messageInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         handleOutgoingMessage(e);
@@ -147,7 +143,6 @@ messageInput.addEventListener('keydown', (e) => {
 
 sendMessageButton.addEventListener('click', handleOutgoingMessage);
 
-// File handling
 fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
@@ -157,68 +152,56 @@ fileInput.addEventListener('change', (e) => {
             userData.file.data = base64Data;
             userData.file.mime_type = file.type;
             
-            // Show file preview
             const previewImg = fileUploadWrapper.querySelector('img');
             previewImg.src = URL.createObjectURL(file);
             fileUploadWrapper.classList.add('has-image');
             
-            // Focus text input after selecting image
             messageInput.focus();
         };
         reader.readAsDataURL(file);
     }
 });
 
-// File upload button click
 document.querySelector('#file-upload').addEventListener('click', () => {
     fileInput.click();
 });
 
-// File cancel button click
 fileCancelButton.addEventListener('click', () => {
     userData.file = { data: null, mime_type: null };
     fileInput.value = '';
     fileUploadWrapper.classList.remove('has-image');
 });
 
-// Replace the current emoji picker implementation with this updated version
 document.querySelector('#emoji-picker').addEventListener('click', async () => {
-    // Remove existing picker if any
     document.querySelector('.emoji-picker-container')?.remove();
     
-    // Create container for the picker
     const container = document.createElement('div');
     container.className = 'emoji-picker-container';
     document.body.appendChild(container);
     
-    // Position the picker
     const emojiButton = document.querySelector('#emoji-picker');
     const rect = emojiButton.getBoundingClientRect();
     
     container.style.position = 'absolute';
     container.style.bottom = `${window.innerHeight - rect.top + 10}px`;
-    container.style.left = `${rect.left - 280}px`; // Align to left edge of button
+    container.style.left = `${rect.left - 280}px`;
     container.style.zIndex = '1000';
     
     try {
-        // Modern emoji-mart implementation
         const { Picker } = window.EmojiMart;
         
         const pickerOptions = {
             onEmojiSelect: (emoji) => {
-                // Insert emoji at cursor position or at the end
                 const cursorPosition = messageInput.selectionStart;
                 const textBeforeCursor = messageInput.value.substring(0, cursorPosition);
                 const textAfterCursor = messageInput.value.substring(cursorPosition);
                 
                 messageInput.value = textBeforeCursor + emoji.native + textAfterCursor;
                 
-                // Move cursor position after the inserted emoji
                 const newCursorPosition = cursorPosition + emoji.native.length;
                 messageInput.setSelectionRange(newCursorPosition, newCursorPosition);
                 messageInput.focus();
                 
-                // Remove emoji picker after selection
                 container.remove();
             },
             theme: 'light',
@@ -227,21 +210,16 @@ document.querySelector('#emoji-picker').addEventListener('click', async () => {
             emojiSize: 20,
         };
         
-        // Create picker element
         if (typeof Picker === 'function') {
-            // Direct component usage
             const picker = new Picker(pickerOptions);
             container.appendChild(picker);
         } else if (typeof Picker === 'object' && Picker.createElement) {
-            // React-style rendering
             container.innerHTML = Picker.createElement(pickerOptions);
         } else {
-            // Fallback for older versions
             const picker = new window.EmojiMart.Picker(pickerOptions);
             container.appendChild(picker.element || picker);
         }
         
-        // Close picker when clicking outside
         document.addEventListener('click', function closeEmojiPicker(e) {
             if (!container.contains(e.target) && e.target !== emojiButton) {
                 container.remove();
@@ -251,7 +229,6 @@ document.querySelector('#emoji-picker').addEventListener('click', async () => {
     } catch (error) {
         console.error("Error initializing emoji picker:", error);
         
-        // Fallback for simple emoji list
         const commonEmojis = ["😀", "😊", "👍", "❤️", "🎉", "👋", "🤔", "😂", "🙏", "👏"];
         
         const simpleList = document.createElement('div');
@@ -287,24 +264,20 @@ document.querySelector('#emoji-picker').addEventListener('click', async () => {
     }
 });
 
-// Make sure file cancel button is hidden by default
 document.addEventListener('DOMContentLoaded', () => {
     const fileCancelBtn = document.querySelector('#file-cancel');
     if (fileCancelBtn) {
         fileCancelBtn.style.display = 'none';
     }
     
-    // Ensure send button works
     const sendBtn = document.querySelector('#send-message');
     if (sendBtn) {
         sendBtn.addEventListener('click', handleOutgoingMessage);
     }
     
-    // Test API connection
     console.log("Chatbot initialized with API URL:", API_URL);
 });
 
-// Add debugging tool
 window.testChatbot = function() {
     messageInput.value = "Hello, can you help me with something?";
     handleOutgoingMessage();
