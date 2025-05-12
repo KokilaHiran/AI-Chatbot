@@ -186,6 +186,21 @@ body {
   display: block;
 }
 
+.file-upload-wrapper.file-uploaded img,
+.file-upload-wrapper.has-image img {
+  display: block;
+}
+
+.file-upload-wrapper.file-uploaded #file-upload,
+.file-upload-wrapper.has-image #file-upload {
+  display: none;
+}
+
+.file-upload-wrapper.file-uploaded #file-cancel,
+.file-upload-wrapper.has-image #file-cancel {
+  display: block;
+}
+
 @media (max-width: 400px) {
   .chat-popup {
     width: 100%;
@@ -231,4 +246,39 @@ body {
     44% {
       opacity: 0.2;
     }
+}
+
+/* Fix for file cancel button */
+#file-cancel {
+  display: none;
+}
+
+.file-upload-wrapper.has-image #file-cancel {
+  display: block;
+}
+
+/* Emoji mart styling */
+.emoji-mart {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* User message styling */
+.user-message {
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.user-message .message-text {
+  background-color: #4a90e2;
+  color: white;
+}
+
+/* Fix for chat message attachments */
+.message img.attachment {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 8px;
+  margin-top: 8px;
 }
