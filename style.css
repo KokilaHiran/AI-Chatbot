@@ -282,3 +282,82 @@ body {
   border-radius: 8px;
   margin-top: 8px;
 }
+
+/* Updated emoji picker styling */
+.emoji-picker-container {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+  background-color: white;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.emoji-picker-container em-emoji-picker {
+  --background-rgb: 255, 255, 255;
+  --border-radius: 0.5rem;
+  --category-icon-size: 20px;
+  --font-family: Arial, sans-serif;
+  height: 350px;
+  width: 280px;
+}
+
+.simple-emoji-list {
+  width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.simple-emoji-list button:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+/* Enhanced message styling with images */
+.message-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 75%;
+}
+
+.user-message .message-container {
+  align-items: flex-end;
+}
+
+.bot-message .message-container {
+  align-items: flex-start;
+}
+
+/* Improve message text with images */
+.message .message-text {
+  max-width: 100%;
+  word-break: break-word;
+}
+
+/* Better image attachment styling */
+.message img.attachment {
+  max-width: 250px;
+  max-height: 200px;
+  border-radius: 12px;
+  object-fit: contain;
+  border: 1px solid rgba(0,0,0,0.1);
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.message.user-message img.attachment {
+  align-self: flex-end;
+}
+
+.message.bot-message img.attachment {
+  align-self: flex-start;
+}
+
+/* Add image caption if needed */
+.image-caption {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: center;
+  margin-top: 4px;
+}

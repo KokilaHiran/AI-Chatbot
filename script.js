@@ -93,19 +93,30 @@ const handleOutgoingMessage = (e) => {
     
     userData.message = messageInput.value.trim();
 
-    if (!userData.message) return;
+    if (!userData.message && !userData.file.data) return;
     
     console.log("Sending message:", userData.message);
     messageInput.value = '';
-    fileUploadWrapper.classList.remove('has-image');
+    
+    // Create message with better structure for images
+    let messageContent = '';
+    
+    if (userData.file.data) {
+        messageContent = `
+            <div class="message-container">
+                <div class="message-text">${userData.message}</div>
+                <img src="data:${userData.file.mime_type};base64,${userData.file.data}" class="attachment" />
+            </div>`;
+    } else {
+        messageContent = `<div class="message-text">${userData.message}</div>`;
+    }
 
-    // Create and display user message
-    const messageElement = `<div class="message-text"></div>${userData.file.data ? `<img src="data:${userData.file.mime_type};base64,${userData.file.data}" class="attachment" />` : ''}`;
-
-    const outgoingMessageDiv = createMessageElement(messageElement, ["user-message"]);
-    outgoingMessageDiv.querySelector('.message-text').textContent = userData.message;
+    const outgoingMessageDiv = createMessageElement(messageContent, ["user-message"]);
     chatBody.appendChild(outgoingMessageDiv);
     chatBody.scrollTo({top: chatBody.scrollHeight, behavior: 'smooth'});
+    
+    // Reset file upload UI
+    fileUploadWrapper.classList.remove('has-image');
 
     // Show bot typing indicator and generate response
     setTimeout(() => {
@@ -150,6 +161,9 @@ fileInput.addEventListener('change', (e) => {
             const previewImg = fileUploadWrapper.querySelector('img');
             previewImg.src = URL.createObjectURL(file);
             fileUploadWrapper.classList.add('has-image');
+            
+            // Focus text input after selecting image
+            messageInput.focus();
         };
         reader.readAsDataURL(file);
     }
@@ -167,50 +181,110 @@ fileCancelButton.addEventListener('click', () => {
     fileUploadWrapper.classList.remove('has-image');
 });
 
-// Implementation of emoji picker functionality
-document.querySelector('#emoji-picker').addEventListener('click', () => {
-    const picker = new EmojiMart.Picker({
-        onEmojiSelect: (emoji) => {
-            // Insert emoji at cursor position or at the end
-            const cursorPosition = messageInput.selectionStart;
-            const textBeforeCursor = messageInput.value.substring(0, cursorPosition);
-            const textAfterCursor = messageInput.value.substring(cursorPosition);
-            
-            messageInput.value = textBeforeCursor + emoji.native + textAfterCursor;
-            
-            // Move cursor position after the inserted emoji
-            const newCursorPosition = cursorPosition + emoji.native.length;
-            messageInput.setSelectionRange(newCursorPosition, newCursorPosition);
-            messageInput.focus();
-            
-            // Remove emoji picker after selection
-            document.querySelector('.emoji-mart')?.remove();
-        },
-        set: 'native'
-    });
-    
+// Replace the current emoji picker implementation with this updated version
+document.querySelector('#emoji-picker').addEventListener('click', async () => {
     // Remove existing picker if any
-    document.querySelector('.emoji-mart')?.remove();
+    document.querySelector('.emoji-picker-container')?.remove();
     
-    // Position the picker near the emoji button
+    // Create container for the picker
+    const container = document.createElement('div');
+    container.className = 'emoji-picker-container';
+    document.body.appendChild(container);
+    
+    // Position the picker
     const emojiButton = document.querySelector('#emoji-picker');
     const rect = emojiButton.getBoundingClientRect();
     
-    const pickerElement = picker.element;
-    document.body.appendChild(pickerElement);
+    container.style.position = 'absolute';
+    container.style.bottom = `${window.innerHeight - rect.top + 10}px`;
+    container.style.left = `${rect.left - 280}px`; // Align to left edge of button
+    container.style.zIndex = '1000';
     
-    pickerElement.style.position = 'absolute';
-    pickerElement.style.bottom = `${window.innerHeight - rect.top + 10}px`;
-    pickerElement.style.left = `${rect.left}px`;
-    pickerElement.style.zIndex = '1000';
-    
-    // Close picker when clicking outside
-    document.addEventListener('click', function closeEmojiPicker(e) {
-        if (!pickerElement.contains(e.target) && e.target !== emojiButton) {
-            document.querySelector('.emoji-mart')?.remove();
-            document.removeEventListener('click', closeEmojiPicker);
+    try {
+        // Modern emoji-mart implementation
+        const { Picker } = window.EmojiMart;
+        
+        const pickerOptions = {
+            onEmojiSelect: (emoji) => {
+                // Insert emoji at cursor position or at the end
+                const cursorPosition = messageInput.selectionStart;
+                const textBeforeCursor = messageInput.value.substring(0, cursorPosition);
+                const textAfterCursor = messageInput.value.substring(cursorPosition);
+                
+                messageInput.value = textBeforeCursor + emoji.native + textAfterCursor;
+                
+                // Move cursor position after the inserted emoji
+                const newCursorPosition = cursorPosition + emoji.native.length;
+                messageInput.setSelectionRange(newCursorPosition, newCursorPosition);
+                messageInput.focus();
+                
+                // Remove emoji picker after selection
+                container.remove();
+            },
+            theme: 'light',
+            set: 'native',
+            showSkinTones: false,
+            emojiSize: 20,
+        };
+        
+        // Create picker element
+        if (typeof Picker === 'function') {
+            // Direct component usage
+            const picker = new Picker(pickerOptions);
+            container.appendChild(picker);
+        } else if (typeof Picker === 'object' && Picker.createElement) {
+            // React-style rendering
+            container.innerHTML = Picker.createElement(pickerOptions);
+        } else {
+            // Fallback for older versions
+            const picker = new window.EmojiMart.Picker(pickerOptions);
+            container.appendChild(picker.element || picker);
         }
-    });
+        
+        // Close picker when clicking outside
+        document.addEventListener('click', function closeEmojiPicker(e) {
+            if (!container.contains(e.target) && e.target !== emojiButton) {
+                container.remove();
+                document.removeEventListener('click', closeEmojiPicker);
+            }
+        });
+    } catch (error) {
+        console.error("Error initializing emoji picker:", error);
+        
+        // Fallback for simple emoji list
+        const commonEmojis = ["😀", "😊", "👍", "❤️", "🎉", "👋", "🤔", "😂", "🙏", "👏"];
+        
+        const simpleList = document.createElement('div');
+        simpleList.className = 'simple-emoji-list';
+        simpleList.style.backgroundColor = 'white';
+        simpleList.style.border = '1px solid #ccc';
+        simpleList.style.borderRadius = '8px';
+        simpleList.style.padding = '8px';
+        simpleList.style.display = 'flex';
+        simpleList.style.flexWrap = 'wrap';
+        simpleList.style.gap = '10px';
+        
+        commonEmojis.forEach(emoji => {
+            const emojiButton = document.createElement('button');
+            emojiButton.textContent = emoji;
+            emojiButton.style.fontSize = '24px';
+            emojiButton.style.background = 'none';
+            emojiButton.style.border = 'none';
+            emojiButton.style.cursor = 'pointer';
+            emojiButton.onclick = () => {
+                const cursorPosition = messageInput.selectionStart;
+                const textBeforeCursor = messageInput.value.substring(0, cursorPosition);
+                const textAfterCursor = messageInput.value.substring(cursorPosition);
+                
+                messageInput.value = textBeforeCursor + emoji + textAfterCursor;
+                messageInput.focus();
+                container.remove();
+            };
+            simpleList.appendChild(emojiButton);
+        });
+        
+        container.appendChild(simpleList);
+    }
 });
 
 // Make sure file cancel button is hidden by default
