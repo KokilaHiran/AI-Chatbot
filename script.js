@@ -24,7 +24,6 @@ const createMessageElement = (content, classes) => {
 };
   
 const generateBotResponse = async (incomingMessageDiv) => {
-    // Updated request structure to match Gemini API requirements
     const requestOption = {
         method: 'POST',
         headers: {
@@ -38,7 +37,6 @@ const generateBotResponse = async (incomingMessageDiv) => {
         })
     };
 
-    // Add image to request if available
     if (userData.file.data) {
         try {
             const contents = JSON.parse(requestOption.body).contents;
